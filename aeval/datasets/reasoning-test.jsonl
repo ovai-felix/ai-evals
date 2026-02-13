@@ -1,0 +1,10 @@
+{"prompt": "If a train travels at 60 mph for 2.5 hours, how many miles does it travel? Answer with just the number.", "reference": "150"}
+{"prompt": "What is 17 * 23? Answer with just the number.", "reference": "391"}
+{"prompt": "If you have 3 apples and give away 1, then buy 5 more, how many do you have? Answer with just the number.", "reference": "7"}
+{"prompt": "What is the next number in the sequence: 2, 6, 18, 54, ...? Answer with just the number.", "reference": "162"}
+{"prompt": "A rectangle has a length of 8 and a width of 5. What is its area? Answer with just the number.", "reference": "40"}
+{"prompt": "If 5 workers can build a wall in 10 days, how many days would it take 10 workers? Answer with just the number.", "reference": "5"}
+{"prompt": "What is 15% of 200? Answer with just the number.", "reference": "30"}
+{"prompt": "How many sides does a hexagon have? Answer with just the number.", "reference": "6"}
+{"prompt": "What is the square root of 144? Answer with just the number.", "reference": "12"}
+{"prompt": "If a shirt costs $40 after a 20% discount, what was the original price? Answer with just the number.", "reference": "50"}

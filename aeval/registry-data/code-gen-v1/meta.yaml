@@ -1,0 +1,11 @@
+name: code-gen-v1
+version: "1.0"
+description: "15-item code generation eval with subprocess execution and LLM-judge fallback."
+category: code-generation
+tags:
+  - code-generation
+  - execution
+  - core
+  - v1
+threshold: 0.5
+dataset: dataset.jsonl

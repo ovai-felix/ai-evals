@@ -1,0 +1,11 @@
+name: reasoning-v1
+version: "1.0"
+description: "25-item multiple choice reasoning evaluation."
+category: reasoning
+tags:
+  - reasoning
+  - multiple-choice
+  - core
+  - v1
+threshold: 0.5
+dataset: dataset.jsonl

@@ -1,0 +1,12 @@
+name: gen-code-debugging-capability_probe
+version: 0.1.0
+description: Auto-generated eval for Code Debugging
+category: Code Debugging
+tags:
+- generated
+- capability_probe
+threshold: 0.7
+dataset: dataset.jsonl
+generated: true
+generation_method: capability_probe
+taxonomy_node: Code Debugging

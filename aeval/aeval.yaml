@@ -1,0 +1,8 @@
+ollama:
+  host: http://localhost:11434
+  timeout: 300
+  keep_alive: 5m
+
+judge_model: ollama:gpt-oss:20b
+datasets_dir: ./datasets
+evals_dir: ./evals

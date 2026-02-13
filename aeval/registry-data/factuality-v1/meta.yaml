@@ -1,0 +1,10 @@
+name: factuality-v1
+version: "1.0"
+description: "25-item factual Q&A with exact match and LLM-judge fallback."
+category: factuality
+tags:
+  - factuality
+  - core
+  - v1
+threshold: 0.6
+dataset: dataset.jsonl

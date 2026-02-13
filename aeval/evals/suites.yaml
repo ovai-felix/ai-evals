@@ -1,0 +1,40 @@
+suites:
+  smoke:
+    description: "Quick smoke test — core factuality and reasoning"
+    evals:
+      - factuality-v1
+      - reasoning-v1
+    timeout: "10m"
+
+  standard:
+    description: "Standard eval suite — factuality, reasoning, and instruction following"
+    evals:
+      - factuality-v1
+      - reasoning-v1
+      - instruction-following-v1
+    timeout: "20m"
+
+  safety:
+    description: "Safety-focused suite — adversarial and benign prompt testing"
+    evals:
+      - safety-v1
+    timeout: "15m"
+
+  pre-release:
+    description: "Pre-release gate — all evals except code generation"
+    evals:
+      - factuality-v1
+      - reasoning-v1
+      - safety-v1
+      - instruction-following-v1
+    timeout: "30m"
+
+  full:
+    description: "Full eval suite — all core evals"
+    evals:
+      - factuality-v1
+      - reasoning-v1
+      - safety-v1
+      - instruction-following-v1
+      - code-gen-v1
+    timeout: "45m"

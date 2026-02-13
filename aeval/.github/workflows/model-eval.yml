@@ -1,0 +1,156 @@
+# Model Evaluation CI Pipeline
+# Runs eval suite against a model on every push that touches model/training code.
+# Requires a self-hosted runner with GPU access and Ollama installed.
+#
+# Exit codes from `aeval ci`:
+#   0 = all evals pass
+#   1 = regression or threshold failure detected
+#   2 = system error (service unreachable, eval not found)
+
+name: Model Evaluation
+
+on:
+  push:
+    paths:
+      - 'models/**'
+      - 'training/**'
+      - 'evals/**'
+  pull_request:
+    paths:
+      - 'models/**'
+      - 'training/**'
+      - 'evals/**'
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model to evaluate (e.g., ollama:brain-analyst-ft)'
+        required: true
+        default: 'ollama:brain-analyst-ft'
+      suite:
+        description: 'Eval suite to run'
+        required: true
+        default: 'pre-merge'
+
+env:
+  DEFAULT_MODEL: ollama:brain-analyst-ft
+  DEFAULT_BASELINE: ollama:llama3
+  DEFAULT_SUITE: pre-merge
+
+jobs:
+  eval:
+    name: Run Model Evaluations
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start eval stack
+        run: docker compose up -d
+        working-directory: ./aeval
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for orchestrator to be healthy..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8081/api/v1/health > /dev/null 2>&1; then
+              echo "Orchestrator is ready."
+              break
+            fi
+            echo "Attempt $i/30 — waiting 5s..."
+            sleep 5
+          done
+
+      - name: Install aeval SDK
+        run: pip install -e ./aeval/sdk
+
+      - name: Run eval suite
+        id: eval
+        run: |
+          MODEL="${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+          SUITE="${{ github.event.inputs.suite || env.DEFAULT_SUITE }}"
+
+          aeval ci \
+            --suite "$SUITE" \
+            --model "$MODEL" \
+            --baseline-model "$DEFAULT_BASELINE" \
+            --fail-on regression \
+            --report json > eval-results.json
+
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: Generate PR comment
+        if: github.event_name == 'pull_request'
+        run: |
+          MODEL="${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+          SUITE="${{ github.event.inputs.suite || env.DEFAULT_SUITE }}"
+
+          aeval ci \
+            --suite "$SUITE" \
+            --model "$MODEL" \
+            --baseline-model "$DEFAULT_BASELINE" \
+            --fail-on regression \
+            --report github-pr-comment > pr-comment.md || true
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('pr-comment.md', 'utf8');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval-results.json
+
+      - name: Teardown
+        if: always()
+        run: docker compose down
+        working-directory: ./aeval
+
+  safety-gate:
+    name: Safety Regression Gate
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start eval stack
+        run: docker compose up -d
+        working-directory: ./aeval
+
+      - name: Wait for services
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8081/api/v1/health > /dev/null 2>&1 && break
+            sleep 5
+          done
+
+      - name: Install aeval SDK
+        run: pip install -e ./aeval/sdk
+
+      - name: Run safety suite
+        run: |
+          MODEL="${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+
+          aeval ci \
+            --suite safety \
+            --model "$MODEL" \
+            --fail-on threshold \
+            --report console
+
+      - name: Teardown
+        if: always()
+        run: docker compose down
+        working-directory: ./aeval

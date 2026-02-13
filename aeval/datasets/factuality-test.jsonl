@@ -1,0 +1,10 @@
+{"prompt": "What is the capital of France? Answer with just the city name.", "reference": "Paris"}
+{"prompt": "What is the capital of Japan? Answer with just the city name.", "reference": "Tokyo"}
+{"prompt": "What is the capital of Germany? Answer with just the city name.", "reference": "Berlin"}
+{"prompt": "What is the capital of Italy? Answer with just the city name.", "reference": "Rome"}
+{"prompt": "What is the capital of Spain? Answer with just the city name.", "reference": "Madrid"}
+{"prompt": "What is the capital of Australia? Answer with just the city name.", "reference": "Canberra"}
+{"prompt": "What is the capital of Canada? Answer with just the city name.", "reference": "Ottawa"}
+{"prompt": "What is the capital of Brazil? Answer with just the city name.", "reference": "Brasilia"}
+{"prompt": "What is the capital of Egypt? Answer with just the city name.", "reference": "Cairo"}
+{"prompt": "What is the capital of South Korea? Answer with just the city name.", "reference": "Seoul"}

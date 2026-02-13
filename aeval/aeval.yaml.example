@@ -1,0 +1,16 @@
+# aeval configuration
+# Copy to aeval.yaml and customize
+
+ollama:
+  host: http://localhost:11434
+  timeout: 120          # seconds per request
+  keep_alive: 5m        # how long Ollama keeps model in VRAM after last request
+
+# Default judge model for LLM-as-judge scorers
+judge_model: ollama:gpt-oss:20b
+
+# Eval datasets directory
+datasets_dir: ./datasets
+
+# Eval definitions directory
+evals_dir: ./evals
