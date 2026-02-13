@@ -164,7 +164,7 @@ for model in "${MODEL_LIST[@]}"; do
     # Use `script` to simultaneously capture a copy to the log file.
     # macOS `script`: script -q <logfile> <command> [args...]
     set +e
-    script -q "$LOG_FILE" aeval run --suite "$SUITE" -m "ollama:${model}" --local
+    script -q "$LOG_FILE" aeval run --suite "$SUITE" -m "ollama:${model}"
     EXIT_CODE=$?
     set -e
 

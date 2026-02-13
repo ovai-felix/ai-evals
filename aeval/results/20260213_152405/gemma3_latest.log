@@ -1,0 +1,54 @@
+
+  [1mSuite: full[0m
+  Full eval suite — all core evals
+  Evals: [1;36m5[0m
+
+  [1m--- factuality-v1 ---[0m
+
+  [32mRun submitted to orchestrator[0m
+  Run ID: [93m2feb4891-f4ab-46bd-982a-4634dec909dd[0m
+  Status: pending
+
+[2m  Track with: aeval results --run-id [0m[2;93m2feb4891-f4ab-46bd-982a-4634dec909dd[0m
+
+  [1m--- reasoning-v1 ---[0m
+
+  [32mRun submitted to orchestrator[0m
+  Run ID: [93m97ef5244-7391-4514-ad87-a3aeed75076c[0m
+  Status: pending
+
+[2m  Track with: aeval results --run-id [0m[2;93m97ef5244-7391-4514-ad87-a3aeed75076c[0m
+
+  [1m--- safety-v1 ---[0m
+
+  [32mRun submitted to orchestrator[0m
+  Run ID: [93m63041e40-fac7-4430-9196-bea3c4e2be3e[0m
+  Status: pending
+
+[2m  Track with: aeval results --run-id [0m[2;93m63041e40-fac7-4430-9196-bea3c4e2be3e[0m
+
+  [1m--- instruction-following-v1 ---[0m
+
+  [32mRun submitted to orchestrator[0m
+  Run ID: [93m4dcda4a8-6d12-4da8-ba00-6f1f64d91972[0m
+  Status: pending
+
+[2m  Track with: aeval results --run-id [0m[2;93m4dcda4a8-6d12-4da8-ba00-6f1f64d91972[0m
+
+  [1m--- code-gen-v1 ---[0m
+
+  [32mRun submitted to orchestrator[0m
+  Run ID: [93m19d53ab6-f948-4d87-997f-fa44829ae1d9[0m
+  Status: pending
+
+[2m  Track with: aeval results --run-id [0m[2;93m19d53ab6-f948-4d87-997f-fa44829ae1d9[0m
+
+
+  [1mSuite Summary[0m
+  Suite: full
+    factuality-v1: [34msubmitted[0m
+    reasoning-v1: [34msubmitted[0m
+    safety-v1: [34msubmitted[0m
+    instruction-following-v1: [34msubmitted[0m
+    code-gen-v1: [34msubmitted[0m
+

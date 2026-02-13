@@ -41,6 +41,7 @@ services:
       - ./evals:/app/evals:ro
       - ./datasets:/app/datasets:ro
       - ./registry-data:/app/registry-data
+      - ./sdk:/app/sdk:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

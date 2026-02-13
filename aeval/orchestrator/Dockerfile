@@ -6,9 +6,10 @@ WORKDIR /app
 COPY orchestrator/requirements.txt /app/orchestrator-requirements.txt
 RUN pip install --no-cache-dir -r /app/orchestrator-requirements.txt
 
-# Install aeval SDK from source
+# Install aeval SDK in editable mode so the volume-mounted source
+# at /app/sdk is used at runtime (changes without rebuild).
 COPY sdk/ /app/sdk/
-RUN pip install --no-cache-dir /app/sdk/
+RUN pip install --no-cache-dir -e /app/sdk/
 
 # Copy orchestrator source
 COPY orchestrator/src/ /app/orchestrator/
