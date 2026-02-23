@@ -4,6 +4,8 @@ import { StatusBadge } from "@/components/status-badge";
 import { ScoreBadge } from "@/components/score-badge";
 import { TaskResultsTable } from "@/components/task-results-table";
 import { EmptyState } from "@/components/empty-state";
+import { TerminalLogViewer } from "@/components/terminal-log-viewer";
+import { DimensionSummary } from "@/components/dimension-summary";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +71,12 @@ export default async function RunDetailPage({
           <p className="text-sm text-danger font-medium">Error</p>
           <p className="text-sm text-text-primary mt-1">{run.error}</p>
         </div>
+      )}
+
+      <TerminalLogViewer runId={run.id} runStatus={run.status} />
+
+      {run.results.length > 0 && (
+        <DimensionSummary results={run.results} />
       )}
 
       <div>

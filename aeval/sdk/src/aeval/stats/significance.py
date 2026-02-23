@@ -143,6 +143,50 @@ def _permutation_test(
     }
 
 
+def cohen_kappa(ratings_a: list, ratings_b: list) -> float:
+    """Compute Cohen's kappa for inter-rater agreement.
+
+    Args:
+        ratings_a: Categorical ratings from rater A.
+        ratings_b: Categorical ratings from rater B.
+
+    Returns:
+        Kappa statistic: 1.0 = perfect agreement, 0.0 = chance, <0 = worse than chance.
+    """
+    if len(ratings_a) != len(ratings_b):
+        raise ValueError(
+            f"Length mismatch: {len(ratings_a)} vs {len(ratings_b)} ratings"
+        )
+
+    n = len(ratings_a)
+    if n == 0:
+        return 0.0
+
+    categories = sorted(set(ratings_a) | set(ratings_b))
+    cat_index = {c: i for i, c in enumerate(categories)}
+    k = len(categories)
+
+    # Build confusion matrix
+    matrix = [[0] * k for _ in range(k)]
+    for a, b in zip(ratings_a, ratings_b):
+        matrix[cat_index[a]][cat_index[b]] += 1
+
+    # Observed agreement
+    p_o = sum(matrix[i][i] for i in range(k)) / n
+
+    # Expected agreement by chance
+    p_e = 0.0
+    for i in range(k):
+        row_sum = sum(matrix[i][j] for j in range(k))
+        col_sum = sum(matrix[j][i] for j in range(k))
+        p_e += (row_sum * col_sum) / (n * n)
+
+    if p_e == 1.0:
+        return 1.0
+
+    return (p_o - p_e) / (1 - p_e)
+
+
 def cohens_d(scores_a: list[float], scores_b: list[float]) -> float:
     """Compute Cohen's d effect size between two groups.
 
