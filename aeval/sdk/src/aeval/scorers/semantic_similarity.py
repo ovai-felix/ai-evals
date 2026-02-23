@@ -18,6 +18,12 @@ def _extract_text(pred: GenerateResponse | str) -> str:
     return pred.text
 
 
+def _extract_response(pred: GenerateResponse | str) -> tuple[str, float, int]:
+    if isinstance(pred, str):
+        return pred, 0.0, 0
+    return pred.text, pred.latency_ms, pred.tokens_used
+
+
 def _tokenize(text: str) -> list[str]:
     """Simple whitespace + lowercased tokenization."""
     return text.lower().split()
@@ -97,7 +103,7 @@ def score_semantic_similarity(
 
     results = []
     for i, (pred, ref) in enumerate(zip(predictions, references)):
-        pred_text = _extract_text(pred)
+        pred_text, latency_ms, tokens_used = _extract_response(pred)
         vec_a, vec_b = _build_tfidf_vectors(pred_text, ref)
         similarity = _cosine_similarity(vec_a, vec_b)
 
@@ -108,6 +114,8 @@ def score_semantic_similarity(
                 passed=similarity >= threshold,
                 prediction=pred_text,
                 reference=ref,
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
                 metadata={
                     "similarity": similarity,
                     "method": "tfidf_cosine",

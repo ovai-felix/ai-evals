@@ -17,6 +17,12 @@ def _extract_text(pred: GenerateResponse | str) -> str:
     return pred.text
 
 
+def _extract_response(pred: GenerateResponse | str) -> tuple[str, float, int]:
+    if isinstance(pred, str):
+        return pred, 0.0, 0
+    return pred.text, pred.latency_ms, pred.tokens_used
+
+
 def _parse_tool_call(text: str) -> dict[str, Any] | None:
     """Parse a JSON tool call from text. Expected: {"function": str, "arguments": dict}."""
     text = text.strip()
@@ -77,7 +83,7 @@ def score_tool_call_accuracy(
 
     results = []
     for i, (pred, ref) in enumerate(zip(predictions, references)):
-        pred_text = _extract_text(pred)
+        pred_text, latency_ms, tokens_used = _extract_response(pred)
         pred_call = _parse_tool_call(pred_text)
         gold_call = _parse_tool_call(ref)
 
@@ -90,6 +96,8 @@ def score_tool_call_accuracy(
                     passed=False,
                     prediction=pred_text,
                     reference=ref,
+                    latency_ms=latency_ms,
+                    tokens_used=tokens_used,
                     metadata={"error": "invalid gold reference"},
                 )
             )
@@ -103,6 +111,8 @@ def score_tool_call_accuracy(
                     passed=False,
                     prediction=pred_text,
                     reference=ref,
+                    latency_ms=latency_ms,
+                    tokens_used=tokens_used,
                     metadata={
                         "function_correct": False,
                         "arg_scores": {},
@@ -137,6 +147,8 @@ def score_tool_call_accuracy(
                 passed=total_score >= 0.5,
                 prediction=pred_text,
                 reference=ref,
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
                 metadata={
                     "function_correct": function_correct,
                     "arg_scores": arg_scores,

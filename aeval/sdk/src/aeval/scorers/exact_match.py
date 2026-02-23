@@ -31,6 +31,12 @@ def _extract_text(pred: GenerateResponse | str) -> str:
     return pred.text
 
 
+def _extract_response(pred: GenerateResponse | str) -> tuple[str, float, int]:
+    if isinstance(pred, str):
+        return pred, 0.0, 0
+    return pred.text, pred.latency_ms, pred.tokens_used
+
+
 def score_exact_match(
     predictions: list[GenerateResponse | str],
     references: list[str],
@@ -59,7 +65,7 @@ def score_exact_match(
 
     results = []
     for i, (pred, ref) in enumerate(zip(predictions, references)):
-        pred_text = _extract_text(pred)
+        pred_text, latency_ms, tokens_used = _extract_response(pred)
 
         if normalize:
             norm_pred = _normalize(pred_text)
@@ -75,6 +81,8 @@ def score_exact_match(
                 passed=match,
                 prediction=pred_text,
                 reference=ref,
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
             )
         )
 

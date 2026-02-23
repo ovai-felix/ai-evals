@@ -51,6 +51,12 @@ def _extract_text(pred: GenerateResponse | str) -> str:
     return pred.text
 
 
+def _extract_response(pred: GenerateResponse | str) -> tuple[str, float, int]:
+    if isinstance(pred, str):
+        return pred, 0.0, 0
+    return pred.text, pred.latency_ms, pred.tokens_used
+
+
 def score_multiple_choice(
     predictions: list[GenerateResponse | str],
     answers: list[str],
@@ -71,7 +77,7 @@ def score_multiple_choice(
 
     results = []
     for i, (pred, answer) in enumerate(zip(predictions, answers)):
-        pred_text = _extract_text(pred)
+        pred_text, latency_ms, tokens_used = _extract_response(pred)
         extracted = _extract_choice(pred_text)
         expected = answer.strip().upper()
         match = extracted == expected
@@ -83,6 +89,8 @@ def score_multiple_choice(
                 passed=match,
                 prediction=pred_text,
                 reference=expected,
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
                 metadata={"extracted_choice": extracted},
             )
         )

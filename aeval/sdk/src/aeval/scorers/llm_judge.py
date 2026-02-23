@@ -34,6 +34,12 @@ def _extract_text(pred: GenerateResponse | str) -> str:
     return pred.text
 
 
+def _extract_response(pred: GenerateResponse | str) -> tuple[str, float, int]:
+    if isinstance(pred, str):
+        return pred, 0.0, 0
+    return pred.text, pred.latency_ms, pred.tokens_used
+
+
 def _extract_rating(text: str, scale: int) -> float | None:
     """Extract a numeric rating from judge output."""
     # Look for a number in the text
@@ -45,12 +51,14 @@ def _extract_rating(text: str, scale: int) -> float | None:
     return None
 
 
-def _parse_model_spec(model_spec: str) -> tuple[str, str | None]:
-    """Parse a model spec like 'ollama:gpt-oss:20b' into (model_name, host)."""
-    if model_spec.startswith("ollama:"):
-        model_name = model_spec[len("ollama:"):]
-        return model_name, None
-    return model_spec, None
+def _parse_model_spec(model_spec: str) -> tuple[str, str]:
+    """Parse a model spec like 'ollama:gpt-oss:20b' into (provider, model_name)."""
+    for prefix in ("ollama:", "openai:", "openrouter:"):
+        if model_spec.startswith(prefix):
+            provider = prefix.rstrip(":")
+            model_name = model_spec[len(prefix):]
+            return provider, model_name
+    return "ollama", model_spec
 
 
 def score_llm_judge(
@@ -81,13 +89,26 @@ def score_llm_judge(
         )
 
     rubric_text = rubric or _DEFAULT_RUBRIC.format(scale=scale)
-    model_name, host = _parse_model_spec(judge_model)
-    kwargs = {"host": host} if host else {}
-    judge = Model.from_ollama(model_name, **kwargs)
+    provider, model_name = _parse_model_spec(judge_model)
+    if provider == "openai":
+        judge = Model.from_openai(model_name)
+    elif provider == "openrouter":
+        judge = Model.from_openrouter(model_name)
+    else:
+        judge = Model.from_ollama(model_name)
+
+    import aeval as _aeval
+    total = len(predictions)
+
+    if _aeval.VERBOSE:
+        print(f"\n  Scoring {total} responses with LLM judge ({judge_model})...")
 
     results = []
     for i, (pred, ref) in enumerate(zip(predictions, references)):
-        pred_text = _extract_text(pred)
+        pred_text, latency_ms, tokens_used = _extract_response(pred)
+
+        if _aeval.VERBOSE:
+            print(f"  [judge {i+1}/{total}] Evaluating...", end="", flush=True)
 
         judge_prompt = _JUDGE_PROMPT_TEMPLATE.format(
             rubric=rubric_text,
@@ -107,6 +128,10 @@ def score_llm_judge(
             # Normalize to 0-1 range
             normalized_score = (rating - 1) / (scale - 1) if scale > 1 else 1.0
 
+        if _aeval.VERBOSE:
+            _status = "PASS" if normalized_score >= 0.6 else "FAIL"
+            print(f" rating={rating}/{scale} → {normalized_score:.2f} [{_status}]")
+
         results.append(
             TaskResult(
                 task_id=str(i),
@@ -114,6 +139,8 @@ def score_llm_judge(
                 passed=normalized_score >= 0.6,
                 prediction=pred_text,
                 reference=ref,
+                latency_ms=latency_ms,
+                tokens_used=tokens_used,
                 metadata={
                     "judge_model": judge_model,
                     "judge_output": judge_text,
