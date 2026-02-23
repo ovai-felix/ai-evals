@@ -6,6 +6,7 @@ import { TaskResultsTable } from "@/components/task-results-table";
 import { EmptyState } from "@/components/empty-state";
 import { TerminalLogViewer } from "@/components/terminal-log-viewer";
 import { DimensionSummary } from "@/components/dimension-summary";
+import { TaskResultsCharts } from "@/components/task-results-charts";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,10 @@ export default async function RunDetailPage({
 
       {run.results.length > 0 && (
         <DimensionSummary results={run.results} />
+      )}
+
+      {run.results.length > 0 && (
+        <TaskResultsCharts results={run.results} />
       )}
 
       <div>
